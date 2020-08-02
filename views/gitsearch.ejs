@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Git Search</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body style="margin: 0;padding: 0;">
+	<div class="container-fluid bg-light pt-5 pl-5 pr-5" style="height: 100vh;">
+		<div class="row bg-white">
+			<div class="col-sm p-5">
+				<div class="row">
+					<div class="col mb-3">
+						<a href="/reports"><button class="btn btn-info" style="float: right;">Search Reports</button></a>
+					</div>
+				</div>
+				<form action='/gitsearch' method='GET' id='git_search_submit_form'>
+					<input type="hidden" id="current_page_num" name='current_page_num' value="<%=currentPage %>">
+					<div class="row mb-3">
+						<div class="col"></div>
+						<div class="col"></div>
+						<div class="col">
+							<label>Entries: <%=totalCount %></label><input type="text" class="form-control" placeholder="Search" id="search_value" name="search_value" value="<%=searchValue %>" onkeyup="showFormSubmitButton(this.value)">
+							<button class="btn btn-success mt-3" type="submit" id="git_search_submit_form_btn" style="display: none;">Submit</button>
+						</div>
+					</div>
+				</form>
+				<% if(data.length) { %>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">Name</th>
+							<th scope="col">Description</th>
+							<th scope="col">Updated On</th>
+							<th scope="col">Link</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% currentCount = ((parseInt(currentPage)-1)*parseInt(takeCount))+1 %>
+						<% for(var i = 0;i < data.length;i++) { %>
+						<tr>
+							<th scope="row"><%=currentCount%></th>
+							<td><%=data[i].full_name %></td>
+							<td><%=data[i].description %></td>
+							<td><%=data[i].updated_at %></td>
+							<td><a href="<%=data[i].html_url %>" target="_blank">Click Here</a></td>
+						</tr>
+						<% currentCount++ } %>
+					</tbody>
+				</table>
+				<% if(parseInt(totalPages)!=0) { %>
+				<nav aria-label="Pagination">
+					<ul class="pagination justify-content-end">
+						<% if(parseInt(currentPage)>2) { %>
+						<li class="page-item"><a class="page-link" onclick="filterWithPageNum(1)">1</a></li>
+						<% } %>
+						<% if(parseInt(currentPage)!=1) { %>
+						<li class="page-item"><a class="page-link" onclick="filterWithPageNum(<%=parseInt(currentPage)-1 %>)"><%=parseInt(currentPage)-1 %></a></li>
+						<% } %>
+						<li class="page-item active"><a class="page-link" onclick="filterWithPageNum(<%=parseInt(currentPage) %>)"><%=parseInt(currentPage) %><span class="sr-only">(current)</span></a></li>
+						<% if(parseInt(currentPage)!=parseInt(totalPages)) { %>
+						<li class="page-item"><a class="page-link" onclick="filterWithPageNum(<%=parseInt(currentPage)+1 %>)"><%=parseInt(currentPage)+1 %></a></li>
+						<% } %>
+						<% if((parseInt(totalPages) - parseInt(currentPage)) >= 2) { %>
+						<li class="page-item"><a class="page-link" onclick="filterWithPageNum(<%=parseInt(totalPages) %>)"><%=parseInt(totalPages) %></a></li>
+						<% } %>
+					</ul>
+				</nav>
+				<% } %>
+				<% } else { %>
+				<div class="text-center"><label>No data</label></div>
+				<% } %>
+			</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script>
+	$(document).ready(function () {
+		showFormSubmitButton($("#search_value").val());
+	});
+
+	function filterWithPageNum(page_num) {
+		$("#current_page_num").val(page_num);
+		$("#git_search_submit_form").submit();
+	}
+
+	function showFormSubmitButton(searchVal) {
+		if(searchVal.length >3 ) {
+			$("#git_search_submit_form_btn").css("display","block");
+		}
+		else {
+			$("#git_search_submit_form_btn").css("display","none");
+		}
+	}
+	</script>
+</body>
+</html>
